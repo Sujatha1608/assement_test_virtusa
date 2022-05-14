@@ -15,6 +15,7 @@ class DisplayInfoViewModel @Inject constructor( private val dataSettUseCase: Dat
 
 
     lateinit var callBack: ViewModelCallBack
+    val isRecyclerviewUpdate = MutableLiveData<Boolean>(false)
     val errorEvent = MutableLiveData<String>()
     val loadingDialogEvent = SingleLiveEvent<Boolean>()
 
@@ -22,13 +23,13 @@ class DisplayInfoViewModel @Inject constructor( private val dataSettUseCase: Dat
     val list = mutableListOf<DataResultResponse>()
 
     init {
-        setUserName()
+//        setUserName()
     }
     interface ViewModelCallBack {
         fun updateRecyclerView(update: Boolean)
 
     }
-    private fun setUserName() {
+    public fun setUserName() {
         loadingDialogEvent.postValue(true)
         dataSettUseCase.execute()
             .subscribeBy(
@@ -42,12 +43,13 @@ class DisplayInfoViewModel @Inject constructor( private val dataSettUseCase: Dat
                             dataResultInfo.clear()
                         }
                         dataResultInfo.addAll(list)
-                        callBack.updateRecyclerView(true)
+                        isRecyclerviewUpdate.value=true
+//                        callBack.updateRecyclerView(true)
                     }
 
                 },
                 onError = { e ->
-                    errorEvent.postValue(e.message.toString())
+                    errorEvent.postValue(e.localizedMessage ?: e.message ?: "Unknown error")
                     loadingDialogEvent.postValue(false)
 
                 }
